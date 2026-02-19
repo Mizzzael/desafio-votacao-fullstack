@@ -8,13 +8,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JWTTokenGenerate implements ITokenGenerate {
+    private final SignKey signKey;
+
+    public JWTTokenGenerate(SignKey signKey) {
+        this.signKey = signKey;
+    }
 
     @Override
     public String generate(User user) {
-        SignKey sk = new SignKey();
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .signWith(sk.getSignKey(), SignatureAlgorithm.ES256)
+                .signWith(signKey.getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 }

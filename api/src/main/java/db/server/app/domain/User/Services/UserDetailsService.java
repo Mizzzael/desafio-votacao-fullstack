@@ -23,7 +23,7 @@ public class UserDetailsService implements IUserDetailsService {
 
         return new org.springframework.security.core.userdetails.User(
             user.getEmail(),
-            user.getPassword(),
+            null,
             List.of()
         );
     }

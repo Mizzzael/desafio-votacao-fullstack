@@ -12,8 +12,13 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
+    private final SignKey sk;
+
+    public JWTService(SignKey sk) {
+        this.sk = sk;
+    }
+
     private Claims extractAllClaims(String token) {
-        SignKey sk = new SignKey();
         return Jwts.parserBuilder()
                 .setSigningKey(sk.getSignKey())
                 .build()

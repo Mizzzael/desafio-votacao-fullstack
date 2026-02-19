@@ -4,13 +4,14 @@ import db.server.app.commons.Helpers.JWT.JWTTokenGenerate;
 import db.server.app.domain.User.Interfaces.IPassEncoder;
 import db.server.app.domain.User.DTO.AuthResponse;
 import db.server.app.domain.User.DTO.LoginCommand;
-import db.server.app.domain.User.Helpers.Exceptions.InvalidCredentials;
 import db.server.app.domain.User.Helpers.Exceptions.InvalidUser;
 import db.server.app.domain.User.Model.User;
 import db.server.app.domain.User.Repository.UserRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 public class AuthUserUseCase {
 
     private final IPassEncoder passEncoder;
@@ -28,10 +29,6 @@ public class AuthUserUseCase {
 
         if (user.isEmpty()) {
             throw new InvalidUser(command.email());
-        }
-
-        if (!passEncoder.matches(command.password(), user.get().getPassword())) {
-            throw new InvalidCredentials();
         }
 
         String token = jwtTokenGenerate.generate(user.get());

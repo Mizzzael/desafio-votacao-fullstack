@@ -5,6 +5,5 @@ import java.util.Optional;
 public record UserDTO(
         Optional<String> id,
         String name,
-        String email,
-        Optional<String> password
+        String email
 ) {}
