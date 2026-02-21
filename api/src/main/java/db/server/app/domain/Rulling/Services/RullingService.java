@@ -6,12 +6,17 @@ import db.server.app.domain.Rulling.Model.Rulling;
 import db.server.app.domain.Rulling.Model.RullingVote;
 import db.server.app.domain.Rulling.Repository.RullingRepository;
 import db.server.app.domain.Rulling.Repository.RullingVoteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 public class RullingService {
@@ -94,4 +99,22 @@ public class RullingService {
     public Boolean userAlreadyVoted(String rullingId, String userId) {
         return this.rullingVoteRepository.findByRullingIdAndUserId(rullingId, userId).isPresent();
     }
+
+    public Long countRullings() {
+        return this.rullingRepository.count();
+    }
+
+    public List<Rulling> getRullings(long page, long pageSize) {
+        Pageable pageable = PageRequest.of(
+                (int) page - 1,
+                (int) pageSize,
+                Sort.by("createdAt").descending()
+        );
+       Page<Rulling> response = this.rullingRepository.findAll(pageable);
+       if (response.isEmpty()) {
+           return List.of();
+       }
+       return response.getContent();
+    }
+
 }

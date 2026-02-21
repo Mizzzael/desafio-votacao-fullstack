@@ -2,11 +2,13 @@ package db.server.app.domain.Rulling.Controllers;
 
 import db.server.app.commons.Records.Http.HttpErrorResponse;
 import db.server.app.domain.Rulling.DTO.NewRullingDTO;
+import db.server.app.domain.Rulling.DTO.RullingCountDTO;
 import db.server.app.domain.Rulling.DTO.RullingDTO;
 import db.server.app.domain.Rulling.Model.Rulling;
 import db.server.app.domain.Rulling.Services.RullingService;
 import db.server.app.domain.User.Model.User;
 import db.server.app.domain.User.Services.AuthService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/rulling")
 public class RullingController {
+    @Value("${spring.pagination.size}")
+    private Long pageSize;
+
     private final RullingService rullingService;
     private final AuthService authService;
 
@@ -35,9 +40,15 @@ public class RullingController {
        Date now = new Date();
        now.setTime(now.getTime() + 1000 * 60);
 
-       if (rullingDTO.expiration().isPresent()) {
+       if (rullingDTO.expiration().isPresent() && !rullingDTO.expiration().get().isEmpty()) {
            Instant expirationInstant = Instant.parse(rullingDTO.expiration().get());
            now = Date.from(expirationInstant);
+
+           if (now.before(new Date())) {
+               return ResponseEntity.
+                       status(HttpStatus.BAD_REQUEST).
+                       body(new HttpErrorResponse(HttpStatus.BAD_REQUEST.value(), Optional.of("Rulling expired")));
+           }
        }
 
         Optional<Rulling> newRulling = this.
@@ -87,5 +98,23 @@ public class RullingController {
         }
 
         return ResponseEntity.ok(rulling.get());
+    }
+
+    @GetMapping("/navigate/info")
+    private ResponseEntity GetRullingInfo() {
+        Long count = this.rullingService.countRullings();
+        double pages = Math.ceil((double) count / pageSize);
+        RullingCountDTO response = new RullingCountDTO(
+                count,
+                (long) pages
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/all/{page}")
+    private ResponseEntity GetRullings(
+            @PathVariable Long page
+    ) {
+        return ResponseEntity.ok(this.rullingService.getRullings(page, pageSize));
     }
 }
