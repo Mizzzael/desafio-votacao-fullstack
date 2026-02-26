@@ -36,7 +36,7 @@ public class RullingController {
     public ResponseEntity SaveRulling(
             @RequestBody NewRullingDTO rullingDTO
     ) throws Exception {
-        User authUser = this.authService.getSessionUser();
+       User authUser = this.authService.getSessionUser();
        Date now = new Date();
        now.setTime(now.getTime() + 1000 * 60);
 

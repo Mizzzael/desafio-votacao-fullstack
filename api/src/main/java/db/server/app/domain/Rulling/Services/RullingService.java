@@ -31,7 +31,7 @@ public class RullingService {
     public Optional<Rulling> save(RullingDTO rulling) throws Exception {
         Rulling newRulling = new Rulling();
         newRulling.setNewRulling(rulling.title(), rulling.description(), rulling.author(), rulling.expiration());
-        this.rullingRepository.save(newRulling);
+        newRulling = this.rullingRepository.save(newRulling);
         return Optional.of(newRulling);
     }
 
